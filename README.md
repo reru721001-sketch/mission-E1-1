@@ -1,4 +1,6 @@
-# 개발 워크스테이션 구축 (Terminal · Docker · Git)
+# 미션 E1-1 : 내 컴퓨터에 개발자용 '작업실' 꾸미기
+
+> 개발 워크스테이션 구축 (Terminal · Docker · Git)
 
 ## 0) 개요
 터미널, Docker, Git을 직접 써 보고 결과를 정리한 저장소입니다.
@@ -7,6 +9,18 @@
 - 결과물을 Git으로 GitHub에 올렸습니다.
 
 실행 결과는 모두 `logs/` 폴더에 있고, `scripts/` 를 실행하면 똑같이 다시 할 수 있습니다.
+
+### 폴더 구성
+**만드는 것(app) / 실행하는 것(scripts) / 결과(logs, docs)** 를 나눠서, 어디에 뭐가 있는지 바로 찾을 수 있게 했습니다.
+
+| 폴더·파일 | 역할 | 이렇게 나눈 이유 |
+|---|---|---|
+| `app/` | 웹 서버 소스(`site/index.html`) + `Dockerfile` | 이미지 만드는 데 필요한 것만 모아서 `docker build ./app` 한 줄로 빌드 |
+| `scripts/` | 실습 명령을 순서대로 적은 파일 (01~04) | 누가 실행해도 같은 순서로 다시 할 수 있게 |
+| `logs/` | 스크립트 실행 결과 (명령 + 출력) | 증거를 한곳에 모음. 스크립트 번호와 같은 이름 |
+| `docs/screenshots/` | 브라우저·VSCode 화면 | 글로 남기기 어려운 증거 |
+| `docker-compose.yml` | 보너스: 컨테이너 2개 설정 | Compose 기본 위치(프로젝트 맨 위) |
+| `.gitignore` | 올리면 안 되는 파일 목록 | 비밀 정보(`.env`, `*.key`)와 연습용 폴더 제외 |
 
 ## 1) 실행 환경
 | 항목 | 값 |
@@ -54,7 +68,12 @@ $ chmod 755 f.txt; ls -l    -rwxr-xr-x  f.txt   # 644 → 755
 $ chmod 700 d; ls -ld d     drwx------  d       # 755 → 700
 ```
 - 숫자 = 읽기(4) + 쓰기(2) + 실행(1), 세 자리는 **나 / 그룹 / 다른 사람**
-- `755`: 나는 전부, 남은 읽기·실행 / `644`: 나는 읽기·쓰기, 남은 읽기만
+
+| 숫자 | 글자 | 뜻 | 주로 쓰는 곳 |
+|---|---|---|---|
+| 755 | `rwxr-xr-x` | 나는 전부, 남은 읽기·실행 | 폴더, 실행 파일 |
+| 644 | `rw-r--r--` | 나는 읽기·쓰기, 남은 읽기만 | 일반 파일 |
+| 700 | `rwx------` | 나만 전부 | 나만 쓰는 폴더 |
 
 ## 5) Docker 설치 · 운영
 ```bash
@@ -83,6 +102,21 @@ my-web-8080   CPU 0.00%   MEM 14.97MiB
 소스: [app/site/index.html](app/site/index.html) · [app/Dockerfile](app/Dockerfile)
 
 nginx 이미지에 내 홈페이지를 넣어서 새 이미지를 만들었습니다.
+- `FROM nginx:1.27-alpine`: nginx 웹 서버 이미지를 바탕으로
+- `COPY site/ /usr/share/nginx/html/`: 내 홈페이지를 nginx가 보여주는 폴더에 넣음
+
+### 이미지 vs 컨테이너
+| | 이미지 | 컨테이너 |
+|---|---|---|
+| 뭐냐 | 실행에 필요한 파일을 묶어 둔 것 (**저장**용) | 이미지를 실행한 것 (**실행** 중) |
+| 바뀌나 | 안 바뀜 (읽기 전용) | 실행 중에 바뀔 수 있음 |
+| 만드는 법 | `docker build` | `docker run` |
+| 예시 | `my-web:1.0` 1개 | `my-web-8080`, `my-web-8081` 2개 |
+
+**수정 흐름**: 홈페이지를 바꾸고 싶으면 실행 중인 컨테이너를 고치는 게 아니라,
+`index.html` 수정 → `docker build`(새 이미지) → 기존 컨테이너 삭제 → `docker run`(새 컨테이너) 순서로 합니다.
+컨테이너 안에서 직접 고친 내용은 컨테이너를 지우면 사라지기 때문입니다.
+
 ```bash
 $ docker build -t my-web:1.0 ./app
 naming to docker.io/library/my-web:1.0 done
@@ -93,6 +127,17 @@ $ curl http://localhost:8080
 
 ## 7) 포트 접속
 `-p 8080:80` = 내 PC 8080번으로 접속하면 컨테이너 80번으로 연결
+
+**왜 필요한가**: 컨테이너는 **네트워크 네임스페이스**라는 기능으로 자기만의 네트워크(IP, 포트)를 따로 가집니다.
+그래서 컨테이너 안의 nginx가 80번에서 돌아가도, 내 PC(호스트)에서는 그 80번이 보이지 않습니다.
+`-p` 로 호스트 포트와 컨테이너 포트를 연결(포트 포워딩)해 줘야 밖에서 접속할 수 있습니다.
+
+| 실행 방법 | `docker ps` PORTS 칸 | 브라우저 접속 |
+|---|---|---|
+| `docker run -d my-web:1.0` (`-p` 없음) | `80/tcp` | ❌ 안 됨 (컨테이너 안에서만 접속 가능) |
+| `docker run -d -p 8080:80 my-web:1.0` | `0.0.0.0:8080->80/tcp` | ✅ `localhost:8080` |
+
+같은 이미지라도 호스트 포트만 다르게(8080, 8081) 주면 여러 개를 동시에 띄울 수 있습니다.
 
 ![8080 접속](docs/screenshots/port-8080.png)
 ![8081 접속](docs/screenshots/port-8081.png)
@@ -120,6 +165,13 @@ $ docker exec vol-test2 cat /data/hello.txt  # 새 컨테이너에서 확인
 hi
 ```
 
+| | 바인드 마운트 | 볼륨 |
+|---|---|---|
+| 저장 위치 | 내 PC 폴더 (내가 지정) | Docker가 관리하는 공간 |
+| 장점 | PC에서 바로 수정·확인 가능 | 컨테이너를 지워도 데이터 유지, OS 상관없이 동작 |
+| 단점 | PC 폴더 경로에 따라 달라짐 | 파일을 직접 열어 보기 불편 |
+| 주로 쓰는 곳 | 개발 중 소스 수정 | 데이터베이스 등 꼭 남아야 하는 데이터 |
+
 ## 10) Git · GitHub
 ```bash
 $ git config --global user.name "손건"
@@ -130,6 +182,21 @@ user.name=손건
 user.email=****@icloud.com
 init.defaultbranch=main
 ```
+
+**GitHub 원격 저장소 연결**
+```bash
+$ git remote add origin https://github.com/reru721001-sketch/songeon-codyssey.git
+$ git remote set-url origin https://github.com/reru721001-sketch/mission-E1-1.git   # 저장소 이름 변경 후
+$ git remote -v
+origin	https://github.com/reru721001-sketch/mission-E1-1.git (fetch)
+origin	https://github.com/reru721001-sketch/mission-E1-1.git (push)
+$ git push -u origin main
+$ git branch -vv
+* main 0959f4b [origin/main] 실습 로그를 텍스트(.txt)로 정리하고 재실행 결과 반영
+```
+- `origin`: GitHub 저장소에 붙인 이름
+- `[origin/main]`: 내 PC의 main 브랜치가 GitHub의 main과 연결돼 있다는 뜻
+
 VSCode에서 GitHub 로그인 후 저장소와 연결했습니다.
 
 ![VSCode GitHub 연동](docs/screenshots/vscode-github.webp)
@@ -165,6 +232,35 @@ $ docker compose down
 - 원인 가설: `cd` 로 폴더를 옮겨서 상대 경로가 틀어진 것 같다.
 - 확인: `pwd` 로 보니 다른 폴더에 있었다.
 - 해결: 로그 경로를 절대 경로로 바꿨다.
+
+**#4 포트 충돌 (`port is already allocated`)**
+- 문제: 이미 8080을 쓰는 컨테이너가 있는데 8080으로 하나 더 실행하니 오류가 났다.
+```bash
+$ docker run -d -p 8080:80 --name conflict-test my-web:1.0
+docker: Error response from daemon: ... Bind for 0.0.0.0:8080 failed: port is already allocated
+```
+- 원인 가설: 다른 컨테이너(또는 프로그램)가 8080을 이미 쓰고 있는 것 같다.
+- 확인: 누가 8080을 쓰는지 순서대로 찾았다.
+```bash
+# 1) 컨테이너 중에 8080을 쓰는 게 있는지
+$ docker ps --filter publish=8080
+NAMES         PORTS
+my-web-8080   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
+
+# 2) 컨테이너가 아니면, PC에서 8080을 쓰는 프로그램(PID) 찾기
+$ netstat -ano | grep LISTEN | grep :8080
+  TCP    0.0.0.0:8080     0.0.0.0:0     LISTENING     25184
+$ powershell "Get-Process -Id 25184"
+25184 com.docker.backend      # Docker가 my-web-8080 때문에 열어 둔 것
+```
+- 해결: 둘 중 하나를 선택한다.
+  - 기존 컨테이너를 끈다: `docker stop my-web-8080` (컨테이너가 아니면 작업 관리자에서 그 PID 종료)
+  - 다른 포트를 쓴다:
+```bash
+$ docker run -d -p 8083:80 --name conflict-test my-web:1.0
+$ curl -s -o /dev/null -w "%{http_code}\n" localhost:8083
+200                                   # 접속 성공
+```
 
 ## 13) 보안
 - `.gitignore` 로 비밀 파일(`.env`, `*.key`)이 올라가지 않게 했습니다.

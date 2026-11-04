@@ -19,16 +19,16 @@
 ## 2) 체크리스트 · 검증 방법
 | 항목 | 확인한 명령 | 확인한 것 | 결과 |
 |---|---|---|---|
-| ✅ 터미널 | `mkdir`, `cp`, `mv`, `rm`, `ls` | 파일·폴더 만들기/복사/이동/삭제 | [3)](#3-터미널), [로그](logs/01_terminal_perm.log) |
-| ✅ 권한 | `chmod`, `ls -l` | 바꾸기 전/후 비교 | [4)](#4-권한), [로그](logs/02_docker.log) |
-| ✅ Docker 설치 | `docker --version`, `docker info` | 설치·실행 여부 | [5)](#5-docker-설치--운영), [로그](logs/02_docker.log) |
-| ✅ Docker 운영 | `images`, `ps -a`, `logs`, `stats` | 이미지·컨테이너 상태 | [5)](#5-docker-설치--운영), [로그](logs/02_docker.log) |
-| ✅ Dockerfile | `docker build`, `docker run` | 내 페이지가 뜨는지 | [6)](#6-dockerfile-웹-서버), [로그](logs/02_docker.log) |
+| ✅ 터미널 | `mkdir`, `cp`, `mv`, `rm`, `ls` | 파일·폴더 만들기/복사/이동/삭제 | [3)](#3-터미널), [로그](logs/01_terminal_perm.txt) |
+| ✅ 권한 | `chmod`, `ls -l` | 바꾸기 전/후 비교 | [4)](#4-권한), [로그](logs/02_docker.txt) |
+| ✅ Docker 설치 | `docker --version`, `docker info` | 설치·실행 여부 | [5)](#5-docker-설치--운영), [로그](logs/02_docker.txt) |
+| ✅ Docker 운영 | `images`, `ps -a`, `logs`, `stats` | 이미지·컨테이너 상태 | [5)](#5-docker-설치--운영), [로그](logs/02_docker.txt) |
+| ✅ Dockerfile | `docker build`, `docker run` | 내 페이지가 뜨는지 | [6)](#6-dockerfile-웹-서버), [로그](logs/02_docker.txt) |
 | ✅ 포트 | `-p 8080:80`, `-p 8081:80` | 브라우저 접속 | [7)](#7-포트-접속) |
-| ✅ 바인드 마운트 | `-v 폴더:경로` | 수정 전/후 비교 | [8)](#8-바인드-마운트), [로그](logs/02_docker.log) |
-| ✅ 볼륨 | `docker volume` | 삭제 전/후 비교 | [9)](#9-볼륨), [로그](logs/02_docker.log) |
+| ✅ 바인드 마운트 | `-v 폴더:경로` | 수정 전/후 비교 | [8)](#8-바인드-마운트), [로그](logs/02_docker.txt) |
+| ✅ 볼륨 | `docker volume` | 삭제 전/후 비교 | [9)](#9-볼륨), [로그](logs/02_docker.txt) |
 | ✅ Git / GitHub | `git config`, VSCode | 설정·연동 | [10)](#10-git--github) |
-| ✅ (보너스) Compose | `docker compose` | 컨테이너 2개 동시 실행 | [11)](#11-보너스-compose), [로그](logs/03_compose.log) |
+| ✅ (보너스) Compose | `docker compose` | 컨테이너 2개 동시 실행 | [11)](#11-보너스-compose), [로그](logs/03_compose.txt) |
 
 ---
 
@@ -75,7 +75,7 @@ $ docker logs my-web-8080
 $ docker stats --no-stream
 my-web-8080   CPU 0.00%   MEM 14.97MiB
 ```
-**attach vs exec** ([로그](logs/04_attach_exec.log))
+**attach vs exec** ([로그](logs/04_attach_exec.txt))
 - `attach`: 컨테이너의 메인 프로그램에 연결 → exit 하면 **컨테이너 꺼짐**
 - `exec`: 새 프로그램을 하나 더 실행 → exit 해도 **컨테이너 계속 실행**
 

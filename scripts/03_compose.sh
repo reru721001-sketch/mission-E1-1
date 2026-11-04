@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 보너스: Compose up/ps/logs/네트워크 통신/down. 실행: bash scripts/03_compose.sh
 cd "$(dirname "$0")/.."
-LOG="$(pwd)/logs/03_compose.log"
+LOG="$(pwd)/logs/03_compose.txt"
 : > "$LOG"
 run() { echo "\$ $*" | tee -a "$LOG"; eval "$@" 2>&1 | tee -a "$LOG"; echo | tee -a "$LOG"; }
 export MSYS_NO_PATHCONV=1

@@ -3,7 +3,7 @@
 # 전제: Docker(Desktop/OrbStack) 실행 중. 실행: bash scripts/02_docker.sh
 cd "$(dirname "$0")/.."
 ROOT="$(pwd)"
-LOG="$(pwd)/logs/02_docker.log"
+LOG="$(pwd)/logs/02_docker.txt"
 : > "$LOG"
 run() { echo "\$ $*" | tee -a "$LOG"; eval "$@" 2>&1 | tee -a "$LOG"; echo | tee -a "$LOG"; }
 export MSYS_NO_PATHCONV=1   # Git Bash 에서 /data 같은 경로가 C:/... 로 변환되는 문제 방지

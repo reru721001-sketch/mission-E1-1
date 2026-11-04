@@ -3,7 +3,7 @@
 # 대화형 터미널(TTY)이 없는 환경이라 -i 로 표준입력을 열고 명령을 셸에 직접 전달한다.
 # 직접 손으로 하려면: docker run -it ubuntu:24.04 bash (Git Bash 는 앞에 winpty)
 cd "$(dirname "$0")/.."
-LOG="$(pwd)/logs/04_attach_exec.log"
+LOG="$(pwd)/logs/04_attach_exec.txt"
 : > "$LOG"
 run() { echo "\$ $*" | tee -a "$LOG"; eval "$@" 2>&1 | tee -a "$LOG"; echo | tee -a "$LOG"; }
 docker rm -f ubuntu-it ubuntu-ae >/dev/null 2>&1

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # 터미널 기본 조작 + 권한 실습. 실행: bash scripts/01_terminal_perm.sh
-# 결과는 logs/01_terminal_perm.log 에 "명령 + 출력" 형태로 저장된다.
+# 결과는 logs/01_terminal_perm.txt 에 "명령 + 출력" 형태로 저장된다.
 cd "$(dirname "$0")/.."
-LOG="$(pwd)/logs/01_terminal_perm.log"
+LOG="$(pwd)/logs/01_terminal_perm.txt"
 : > "$LOG"
 run() { echo "\$ $*" | tee -a "$LOG"; eval "$@" 2>&1 | tee -a "$LOG"; echo | tee -a "$LOG"; }
 
